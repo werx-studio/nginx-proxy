@@ -3,11 +3,11 @@
 		{{/* If we got the containers from swarm and this container's port is published to host, use host IP:PORT */}}
 		{{ if and .Container.Node.ID .Address.HostPort }}
 			# {{ .Container.Node.Name }}/{{ .Container.Name }}
-			server {{ .Container.Node.Address.IP }}:{{ .Address.HostPort }};
+			server {{ .Container.Node.Address.IP }}:{{ .Address.HostPort }} {{if .Container.Env.WEIGHT }}weight={{.Container.Env.WEIGHT}}{{end}};
 		{{/* If there is no swarm node or the port is not published on host, use container's IP:PORT */}}
 		{{ else }}
 			# {{ .Container.Name }}
-			server {{ .Address.IP }}:{{ .Address.Port }};
+			server {{ .Address.IP }}:{{ .Address.Port }} {{if .Container.Env.WEIGHT }}weight={{.Container.Env.WEIGHT}}{{end}};
 		{{ end }}
 	{{ else }}
 		# {{ .Container.Name }}

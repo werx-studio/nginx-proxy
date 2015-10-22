@@ -47,6 +47,10 @@ To set the default host for nginx use the env var `DEFAULT_HOST=foo.bar.com` for
 
 If you would like to use least_conn instead of round robin, set `BALANCE=least_conn` on the backend container.
 
+### Node Weight
+
+If you would like to specify a weight to a container, set `WEIGHT=10` on the backend container.
+
 ### Separate Containers
 
 nginx-proxy can also be run as two separate containers using the [jwilder/docker-gen](https://index.docker.io/u/jwilder/docker-gen/)
