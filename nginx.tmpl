@@ -72,7 +72,10 @@ server {
 
 {{ range $host, $containers := groupByMulti $ "Env.VIRTUAL_HOST" "," }}
 
+{{/* Get the load balance defined by containers w/ the same vhost, falling back to default */}}
+{{ $balance := or (first (groupByKeys $containers "Env.BALANCE")) "" }}
 upstream {{ $host }} {
+	{{ $balance }}{{ if $balance }};{{end}}
 {{ range $container := $containers }}
 	{{ $addrLen := len $container.Addresses }}
 	{{/* If only 1 port exposed, use that */}}
