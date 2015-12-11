@@ -1,4 +1,4 @@
-FROM nginx:1.9.6
+FROM benhall/nginx-sticky:1.9.7
 MAINTAINER Jason Wilder mail@jasonwilder.com
 
 # Install wget and install/updates certificates
@@ -21,7 +21,7 @@ ENV DOCKER_GEN_VERSION 0.4.2
 
 RUN wget https://github.com/jwilder/docker-gen/releases/download/$DOCKER_GEN_VERSION/docker-gen-linux-amd64-$DOCKER_GEN_VERSION.tar.gz \
  && tar -C /usr/local/bin -xvzf docker-gen-linux-amd64-$DOCKER_GEN_VERSION.tar.gz \
- && rm /docker-gen-linux-amd64-$DOCKER_GEN_VERSION.tar.gz
+ && rm docker-gen-linux-amd64-$DOCKER_GEN_VERSION.tar.gz
 
 COPY . /app/
 WORKDIR /app/
