@@ -18,7 +18,7 @@ test:
 	bats test
 
 push:
-	benhall/nginx-proxy:$(TAG)-sticky-letsencrypt
+	docker push benhall/nginx-proxy:$(TAG)-sticky-letsencrypt
 
 build: 
 	docker build -t benhall/nginx-proxy:$(TAG)-sticky-letsencrypt .
