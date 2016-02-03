@@ -1,6 +1,8 @@
 .SILENT :
 .PHONY : test
 
+TAG=1.9.10
+
 update-dependencies:
 	docker pull jwilder/docker-gen:latest
 	docker pull nginx:latest
@@ -12,3 +14,6 @@ update-dependencies:
 test:
 	docker build -t jwilder/nginx-proxy:bats .
 	bats test
+
+push:
+	benhall/nginx-proxy:$(TAG)-sticky-letsencrypt
