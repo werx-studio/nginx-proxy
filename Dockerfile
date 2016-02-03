@@ -1,4 +1,4 @@
-FROM benhall/nginx-sticky:1.9.7
+FROM benhall/nginx-sticky:1.9.10
 MAINTAINER Jason Wilder mail@jasonwilder.com
 
 # Install wget and install/updates certificates
