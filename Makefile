@@ -1,7 +1,9 @@
 .SILENT :
-.PHONY : test
+.PHONY : test push build
 
 TAG=1.9.10
+
+default: build
 
 update-dependencies:
 	docker pull jwilder/docker-gen:latest
@@ -17,3 +19,6 @@ test:
 
 push:
 	benhall/nginx-proxy:$(TAG)-sticky-letsencrypt
+
+build: 
+	docker build -t benhall/nginx-proxy:$(TAG)-sticky-letsencrypt .
