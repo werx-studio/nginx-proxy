@@ -19,6 +19,7 @@ RUN curl -L https://github.com/jwilder/docker-gen/releases/download/$DOCKER_GEN_
   && rm /docker-gen-linux-amd64-$DOCKER_GEN_VERSION.tar.gz
 
 COPY . /app/
+COPY nginx.conf /etc/nginx/nginx.conf
 WORKDIR /app/
 
 ENV DOCKER_HOST unix:///tmp/docker.sock
