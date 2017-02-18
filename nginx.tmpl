@@ -18,28 +18,28 @@
 # If we receive X-Forwarded-Proto, pass it through; otherwise, pass along the
 # scheme used to connect to this server
 map $http_x_forwarded_proto $proxy_x_forwarded_proto {
-  default $http_x_forwarded_proto;
-  ''      $scheme;
+	default $http_x_forwarded_proto;
+	''      $scheme;
 }
 
 # If we receive X-Forwarded-Port, pass it through; otherwise, pass along the
 # server port the client connected to
 map $http_x_forwarded_port $proxy_x_forwarded_port {
-  default $http_x_forwarded_port;
-  ''      $server_port;
+	default $http_x_forwarded_port;
+	''      $server_port;
 }
 
 # If we receive Upgrade, set Connection to "upgrade"; otherwise, delete any
 # Connection header that may have been passed to this server
 map $http_upgrade $proxy_connection {
-  default upgrade;
-  '' close;
+	default upgrade;
+	'' close;
 }
 
 # Set appropriate X-Forwarded-Ssl header
 map $scheme $proxy_x_forwarded_ssl {
-  default off;
-  https on;
+	default off;
+	https on;
 }
 
 # CloudFlare
@@ -68,8 +68,8 @@ real_ip_header CF-Connecting-IP;
 gzip_types text/plain text/css application/javascript application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
 
 log_format vhost '$host $remote_addr - $remote_user [$time_local] '
-                 '"$request" $status $body_bytes_sent '
-                 '"$http_referer" "$http_user_agent"';
+								 '"$request" $status $body_bytes_sent '
+								 '"$http_referer" "$http_user_agent"';
 
 access_log off;
 
@@ -114,10 +114,12 @@ server {
 
 {{ range $host, $containers := groupByMulti $ "Env.VIRTUAL_HOST" "," }}
 {{ $balance := or (first (groupByKeys $containers "Env.BALANCE")) "" }}
-{{ $upstream_name := sha1 $host }}
+{{ $check := or (first (groupByKeys $containers "Env.CHECK")) "" }}
+{{ $upstream_name := $host }}
 # {{ $host }}
 upstream {{ $upstream_name }} {
 	{{ $balance }}{{ if $balance }};{{end}}
+
 {{ range $container := $containers }}
 	{{ $addrLen := len $container.Addresses }}
 	{{/* If only 1 port exposed, use that */}}
@@ -131,6 +133,12 @@ upstream {{ $upstream_name }} {
 		{{ template "upstream" (dict "Container" $container "Address" $address) }}
 	{{ end }}
 {{ end }}
+
+	{{if $check }}
+		check interval=60000 rise=1 fall=2 timeout=1000 default_down=false type=http;
+		check_http_send "GET {{$check}} HTTP/1.1\r\nHost: {{$host}} \r\n\r\n";
+		check_http_expect_alive http_2xx http_3xx;
+	{{end}}
 }
 
 {{ $default_host := or ($.Env.DEFAULT_HOST) "" }}
@@ -195,12 +203,12 @@ server {
 	{{ end }}
 
 	location ^~ /.well-known/acme-challenge/ {
-	  default_type "text/plain";
-	  alias /data/acme-challenge/;
+		default_type "text/plain";
+		alias /data/acme-challenge/;
 	}
 
 	location = /.well-known/acme-challenge/ {
-	  return 404;
+		return 404;
 	}
 
 	location / {
@@ -219,11 +227,11 @@ server {
 		auth_basic	"Restricted {{ $host }}";
 		auth_basic_user_file	{{ (printf "/etc/nginx/htpasswd/%s" $host) }};
 		{{ end }}
-                {{ if (exists (printf "/etc/nginx/vhost.d/%s_location" $host)) }}
-                include {{ printf "/etc/nginx/vhost.d/%s_location" $host}};
-                {{ else if (exists "/etc/nginx/vhost.d/default_location") }}
-                include /etc/nginx/vhost.d/default_location;
-                {{ end }}
+								{{ if (exists (printf "/etc/nginx/vhost.d/%s_location" $host)) }}
+								include {{ printf "/etc/nginx/vhost.d/%s_location" $host}};
+								{{ else if (exists "/etc/nginx/vhost.d/default_location") }}
+								include /etc/nginx/vhost.d/default_location;
+								{{ end }}
 	}
 }
 
@@ -242,13 +250,15 @@ server {
 	include /etc/nginx/vhost.d/default;
 	{{ end }}
 
+	location /_nginx_status { check_status csv; allow 127.0.0.1; deny all;  }
+
 	location ^~ /.well-known/acme-challenge/ {
-	  default_type "text/plain";
-	  alias /data/acme-challenge/;
+		default_type "text/plain";
+		alias /data/acme-challenge/;
 	}
 
 	location = /.well-known/acme-challenge/ {
-	  return 404;
+		return 404;
 	}
 
 	location / {
@@ -267,11 +277,11 @@ server {
 		auth_basic	"Restricted {{ $host }}";
 		auth_basic_user_file	{{ (printf "/etc/nginx/htpasswd/%s" $host) }};
 		{{ end }}
-                {{ if (exists (printf "/etc/nginx/vhost.d/%s_location" $host)) }}
-                include {{ printf "/etc/nginx/vhost.d/%s_location" $host}};
-                {{ else if (exists "/etc/nginx/vhost.d/default_location") }}
-                include /etc/nginx/vhost.d/default_location;
-                {{ end }}
+								{{ if (exists (printf "/etc/nginx/vhost.d/%s_location" $host)) }}
+								include {{ printf "/etc/nginx/vhost.d/%s_location" $host}};
+								{{ else if (exists "/etc/nginx/vhost.d/default_location") }}
+								include /etc/nginx/vhost.d/default_location;
+								{{ end }}
 	}
 }
 

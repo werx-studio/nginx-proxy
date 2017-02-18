@@ -1,4 +1,4 @@
-FROM benhall/nginx-sticky:1.11.9
+FROM benhall/nginx-sticky:1.11.10
 
 # Install curl and install/updates certificates
 RUN apt-get update \
